@@ -76,7 +76,8 @@ claude mcp add ci-context \
 - Write tools (re-run a job, comment on a PR), and with them per-tool scopes and GitHub App authentication
 - Remote HTTP transport with OAuth
 - Parsing test reports from artifacts (JUnit, Playwright JSON) instead of logs
-- Wiring into [Storywright](https://github.com/dholman7/storywright) as its CI tool layer
+
+[Storywright](https://github.com/dholman7/storywright) can attach this server as one of its tool sources with `--mcp-server`. The server then receives only the variables Storywright is told to pass.
 
 ## License
 
