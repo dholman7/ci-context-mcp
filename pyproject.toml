@@ -1,7 +1,7 @@
 [project]
 name = "ci-context-mcp"
 version = "0.1.0"
-description = "Read-only MCP server that gives coding assistants CI runs, logs, test results, and coverage"
+description = "Read-only MCP server that gives coding assistants GitHub Actions runs, failure summaries, logs, coverage, and PR checks"
 license = "MIT"
 requires-python = ">=3.13"
 dependencies = ["mcp>=2.3,<3", "httpx>=0.28.0", "pydantic>=2.10.0"]
