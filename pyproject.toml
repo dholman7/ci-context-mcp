@@ -10,7 +10,7 @@ dependencies = ["mcp>=2.3,<3", "httpx>=0.28.0", "pydantic>=2.10.0"]
 ci-context-mcp = "ci_context_mcp.server:main"
 
 [dependency-groups]
-dev = ["pytest>=8.3.0", "ruff>=0.8.0", "mypy>=1.13.0"]
+dev = ["pytest>=8.3.0", "ruff>=0.8.0", "mypy>=1.13.0", "pyyaml>=6.0", "types-pyyaml>=6.0"]
 
 [build-system]
 requires = ["hatchling"]
@@ -28,6 +28,8 @@ select = ["E", "F", "I", "B", "UP", "S", "SIM", "RUF"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["S101", "S105", "E501"]
+# The red team runs the `claude` binary it's given (S603), against a fake GitHub token (S106).
+"redteam/**" = ["S603", "S106"]
 
 [tool.mypy]
 strict = true

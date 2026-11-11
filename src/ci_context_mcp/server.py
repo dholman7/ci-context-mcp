@@ -116,7 +116,12 @@ def build(settings: Settings, github: GitHub | None = None) -> MCPServer:
         return result
 
     def job_lines(repo: str, job_id: int) -> list[str]:
-        return logs.clean(gh.get_log(f"/repos/{repo}/actions/jobs/{job_id}/logs"))
+        lines = logs.clean(gh.get_log(f"/repos/{repo}/actions/jobs/{job_id}/logs"))
+        return logs.strip_instructions(lines) if settings.log_policy == "strip" else lines
+
+    def outgoing(lines: list[str]) -> list[str]:
+        """Log text as a client receives it, fenced unless the policy is off."""
+        return lines if settings.log_policy == "off" else logs.fence(lines)
 
     @server.tool(annotations=READ_ONLY)
     def list_runs(repo: str, branch: str | None = None, limit: int = 10) -> list[Run]:
@@ -149,7 +154,7 @@ def build(settings: Settings, github: GitHub | None = None) -> MCPServer:
                 lines = logs.grep(lines, pattern)
             except ValueError as exc:
                 raise ToolError(str(exc)) from exc
-        return logs.tail(lines, min(max(tail, 1), 500))
+        return outgoing(logs.tail(lines, min(max(tail, 1), 500)))
 
     @server.tool(
         annotations=READ_ONLY,
@@ -170,7 +175,7 @@ def build(settings: Settings, github: GitHub | None = None) -> MCPServer:
                     job=parsed.name,
                     job_id=parsed.id,
                     failed_steps=[s.name for s in parsed.failed_steps],
-                    error_lines=logs.error_lines(job_lines(repo, parsed.id)),
+                    error_lines=outgoing(logs.error_lines(job_lines(repo, parsed.id))),
                 )
             )
         return failures

@@ -38,5 +38,5 @@ jobs:
           enable-cache: true
       - run: uv sync
       - run: uv run ruff check . && uv run ruff format --check .
-      - run: uv run mypy src tests
+      - run: uv run mypy src tests redteam
       - run: uv run pytest
