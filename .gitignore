@@ -8,3 +8,5 @@ __pycache__/
 results/
 traces/
 .DS_Store
+# Published red-team runs are part of the record.
+!redteam/results/

@@ -3,7 +3,7 @@
 import logging
 import os
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Literal
 
 import httpx
 from mcp.server.mcpserver.exceptions import ToolError
@@ -16,11 +16,18 @@ MAX_LOG_BYTES = 5_000_000
 logging.getLogger("httpx").setLevel(logging.WARNING)
 
 
+LogPolicy = Literal["off", "fence", "strip"]
+LOG_POLICIES: tuple[LogPolicy, ...] = ("off", "fence", "strip")
+
+
 @dataclass(frozen=True)
 class Settings:
     token: str
     repos: frozenset[str]
     api_url: str = API_URL
+    # What happens to log text before a client sees it: nothing, wrapped in labeled markers, or
+    # wrapped with lines that read like instructions to an assistant removed.
+    log_policy: LogPolicy = "off"
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -38,7 +45,15 @@ class Settings:
             raise SystemExit(
                 "Set CI_CONTEXT_REPOS to the repos this server may read, e.g. owner/app,owner/lib."
             )
-        return cls(token=token, repos=repos, api_url=os.environ.get("GITHUB_API_URL", API_URL))
+        policy = os.environ.get("CI_CONTEXT_LOG_POLICY", "off")
+        if policy not in LOG_POLICIES:
+            raise SystemExit(f"CI_CONTEXT_LOG_POLICY must be one of {', '.join(LOG_POLICIES)}")
+        return cls(
+            token=token,
+            repos=repos,
+            api_url=os.environ.get("GITHUB_API_URL", API_URL),
+            log_policy=policy,
+        )
 
 
 class GitHub:
