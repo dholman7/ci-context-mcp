@@ -60,9 +60,7 @@ What the policy costs and misses:
 
 ## Set up
 
-```bash
-uv sync
-```
+It's on [PyPI](https://pypi.org/project/ci-context-mcp/), so `uvx ci-context-mcp` runs it with nothing to install.
 
 **Claude Code:**
 
@@ -70,7 +68,7 @@ uv sync
 claude mcp add ci-context \
   -e GITHUB_TOKEN=github_pat_... \
   -e CI_CONTEXT_REPOS=owner/app,owner/lib \
-  -- uv run --project /path/to/ci-context-mcp ci-context-mcp
+  -- uvx ci-context-mcp
 ```
 
 **Cursor** (`.cursor/mcp.json`):
@@ -79,13 +77,15 @@ claude mcp add ci-context \
 {
   "mcpServers": {
     "ci-context": {
-      "command": "uv",
-      "args": ["run", "--project", "/path/to/ci-context-mcp", "ci-context-mcp"],
+      "command": "uvx",
+      "args": ["ci-context-mcp"],
       "env": { "GITHUB_TOKEN": "github_pat_...", "CI_CONTEXT_REPOS": "owner/app,owner/lib" }
     }
   }
 }
 ```
+
+From a clone instead: `uv sync`, then `uv run --project /path/to/ci-context-mcp ci-context-mcp` in place of `uvx ci-context-mcp`.
 
 ## Tests
 
