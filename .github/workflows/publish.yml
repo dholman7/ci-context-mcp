@@ -1,0 +1,29 @@
+name: Publish to PyPI
+
+# On a published GitHub release: build, then upload with PyPI trusted publishing (OIDC), so no
+# PyPI token is stored anywhere. Needs a PyPI pending publisher for this repo, this workflow,
+# and the `pypi` environment.
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write # trusted publishing
+    steps:
+      # A write path: third-party actions are pinned by commit, with the version alongside.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+      - name: The tag matches the package version
+        shell: bash
+        run: |
+          version=$(uv version --short)
+          [ "${GITHUB_REF_NAME#v}" = "$version" ] || { echo "tag $GITHUB_REF_NAME != version $version"; exit 1; }
+      - run: uv build
+      - uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086 # v1.14.3
